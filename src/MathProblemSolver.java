@@ -15,9 +15,12 @@ public class MathProblemSolver {
 
     public String solve(){
         Interpreter interpreter = new Interpreter();
-        interpreter.interpret(expressions);
+        List<Expr> evaluatedExpressions = interpreter.interpret(expressions);
         Stringer stringer = new Stringer();
-        return stringer.stringify(expressions).toString();
+        String s = stringer.stringify(expressions).toString();
+        s += "=";
+        s += stringer.stringify(evaluatedExpressions);
+        return stringer.stringify(expressions).toString() + "=" + stringer.stringify(evaluatedExpressions);
     }
     static void error(int line, String message) {
         report(line, "", message);

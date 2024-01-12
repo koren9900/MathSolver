@@ -34,9 +34,9 @@ public class Stringer  implements Expr.Visitor<String> {
     @Override
     public String visitUnaryExpr(Expr.Unary expr) {
         if(expr.operator.type == TokenType.BANG)
-            return expr.right.accept(this) + expr.operator.literal;
+            return expr.right.accept(this) + expr.operator.lexeme;
 
         else
-            return expr.operator.literal + expr.right.accept(this);
+            return expr.operator.lexeme + expr.right.accept(this);
     }
 }

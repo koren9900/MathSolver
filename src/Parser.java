@@ -47,12 +47,17 @@ class Parser {
 
 
     private Expr unary() {
-        if (match(TokenType.BANG, TokenType.MINUS)) {
+        if (match(TokenType.MINUS)) {
             Token operator = previous();
             Expr right = unary();
             return new Expr.Unary(operator, right);
         }
-        return primary();
+        Expr right = primary();
+        while(match(TokenType.BANG)){
+            Token operator = previous();
+            right = new Expr.Unary(operator, right);
+        }
+        return right;
     }
 
 
