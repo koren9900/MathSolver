@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 class Parser {
@@ -36,8 +37,17 @@ class Parser {
     }
 
     private Expr factor() {
-        Expr expr = unary();
+        Expr expr = exponent();
         while (match(TokenType.SLASH, TokenType.STAR)) {
+            Token operator = previous();
+            Expr right = exponent();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+        return expr;
+    }
+    private Expr exponent() {
+        Expr expr = unary();
+        while (match(TokenType.CARET)) {
             Token operator = previous();
             Expr right = unary();
             expr = new Expr.Binary(expr, operator, right);
@@ -45,16 +55,33 @@ class Parser {
         return expr;
     }
 
-
     private Expr unary() {
-        if (match(TokenType.BANG, TokenType.MINUS)) {
+        if (match(TokenType.MINUS)) {
             Token operator = previous();
             Expr right = unary();
             return new Expr.Unary(operator, right);
         }
+        Expr right = function();
+        while(match(TokenType.BANG)){
+            Token operator = previous();
+            right = new Expr.Unary(operator, right);
+        }
+        return right;
+    }
+    private Expr function(){
+        if(match(TokenType.FUNC)){
+            Token func = previous();
+            consume(TokenType.LEFT_PAREN, "Expect '(' after a function");
+            List<Expr> params = new LinkedList<>();
+            do{
+                params.add(expression());
+
+            }while(match(TokenType.COMMA));
+            consume(TokenType.RIGHT_PAREN, "Expect '(' in the end of a function");
+            return new Expr.Function(func, params);
+        }
         return primary();
     }
-
 
     private Expr primary() {
 

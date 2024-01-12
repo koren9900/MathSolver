@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class Scanner {
     private final String source;
@@ -9,16 +6,18 @@ class Scanner {
     private int start = 0;
     private int current = 0;
     private int line = 1;
-    private static final Map<String, TokenType> keywords;
+    private static final List<String> keywords;
     static {
-        keywords = new HashMap<>();
-        keywords.put("max", TokenType.MAX);
-        keywords.put("min", TokenType.MIN);
-        keywords.put("abs", TokenType.ABS);
-        keywords.put("ceil", TokenType.CEIL);
-        keywords.put("floor", TokenType.FLOOR);
-        keywords.put("round", TokenType.ROUND);
-
+        keywords = new LinkedList<>();
+        keywords.add("max");
+        keywords.add("min");
+        keywords.add("abs");
+        keywords.add("ceil");
+        keywords.add("floor");
+        keywords.add("round");
+        keywords.add("log");
+        keywords.add("sqrt");
+        keywords.add("root");
     }
     Scanner(String source) {
         this.source = source;
@@ -44,6 +43,7 @@ class Scanner {
             case ';': addToken(TokenType.SEMICOLON); break;
             case '*': addToken(TokenType.STAR); break;
             case '/': addToken(TokenType.SLASH); break;
+            case '^': addToken(TokenType.CARET); break;
             case '?': addToken(TokenType.QUESTION); break;
             case ':': addToken(TokenType.COLON); break;
             case '!': addToken(TokenType.BANG); break;
@@ -78,14 +78,12 @@ class Scanner {
         while (isAlphaNumeric(peek())) advance();
 
         String text = source.substring(start, current);
-        TokenType type = keywords.get(text);
-        if (type == null) {
-            for(char c : text.toCharArray()) {
-                type = TokenType.IDENTIFIER;
+
+        if (!keywords.contains(text))
+            for(char c : text.toCharArray())
                 addToken(TokenType.IDENTIFIER, Character.toString(c));
-            }
-        }
-        addToken(type);
+        else
+            addToken(TokenType.FUNC, text.toLowerCase());
     }
     private void number() {
         while (isDigit(peek())) advance();
@@ -97,7 +95,6 @@ class Scanner {
         }
         addToken(TokenType.NUMBER, 	Double.parseDouble(source.substring(start, current)));
     }
-
 
     private boolean match(char expected) {
         if (isAtEnd()) return false;

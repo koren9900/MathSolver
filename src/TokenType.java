@@ -1,7 +1,7 @@
 enum TokenType {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN,
-    COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR, QUESTION, COLON,
+    COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR, QUESTION, COLON, CARET,
     // One or two character tokens.
     BANG,
     EQUAL,
@@ -10,7 +10,7 @@ enum TokenType {
     // Literals.
     IDENTIFIER, NUMBER,
     // Keywords.
-    MAX, MIN, CEIL, FLOOR, ROUND, ABS, QURT, LOG,
+    FUNC,
 
     EOF
 }

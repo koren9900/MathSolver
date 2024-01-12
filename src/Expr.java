@@ -1,3 +1,4 @@
+import java.util.List;
 
 abstract class Expr {
     interface Visitor<R> {
@@ -5,7 +6,7 @@ abstract class Expr {
         R visitGroupingExpr(Grouping expr);
         R visitLiteralExpr(Literal expr);
         R visitUnaryExpr(Unary expr);
-
+        R visitFunctionExpr(Function expr);
     }
 
     static class Binary extends Expr {
@@ -65,6 +66,19 @@ abstract class Expr {
         final Token operator;
         final Expr right;
     }
+    static class Function extends Expr {
+        Function(Token function, List<Expr> parameters) {
+            this.function = function;
+            this.parameters = parameters;
+        }
 
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitFunctionExpr(this);
+        }
+
+        final Token function;
+        final List<Expr> parameters;
+    }
     abstract <R> R accept(Visitor<R> visitor);
 }
