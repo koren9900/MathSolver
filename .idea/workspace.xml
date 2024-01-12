@@ -1,24 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="66edb2ca-3ffa-45d2-9045-312b00fceada" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/MathSolverV2.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Environment.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Expr.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Interpreter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/MathProblemSolver.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Parser.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/RuntimeError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Scanner.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Stringer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Token.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/TokenType.java" afterDir="false" />
+    <list default="true" id="66edb2ca-3ffa-45d2-9045-312b00fceada" name="Changes" comment="functionality added: 3&#10;1. there are four types of expressions: &#10;    1. Binary 5+4&#10;    2. Grouping (4+3)&#10;    3. Literal 5&#10;    4. unary 4!&#10;2. Stringer, Scanner and Parser seem to be working fine&#10;3. MathProblemSolver built, the function his the &quot;head&quot; of the program&#10;functionality to add: 6&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;3. add built-in functions (min, max, log, etc)&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Interpreter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MathProblemSolver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MathProblemSolver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Parser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Stringer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Stringer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,6 +68,14 @@
       <option name="presentableId" value="Default" />
       <updated>1705090237419</updated>
     </task>
+    <task id="LOCAL-00001" summary="functionality added: 3&#10;1. there are four types of expressions: &#10;    1. Binary 5+4&#10;    2. Grouping (4+3)&#10;    3. Literal 5&#10;    4. unary 4!&#10;2. Stringer, Scanner and Parser seem to be working fine&#10;3. MathProblemSolver built, the function his the &quot;head&quot; of the program&#10;functionality to add: 6&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;3. add built-in functions (min, max, log, etc)&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)">
+      <created>1705096508542</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1705096508542</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -91,5 +88,20 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="functionality added: 3&#10;1. there are four types of expressions: &#10;    1. Binary 5+4&#10;    2. Grouping (4+3)&#10;    3. Literal 5&#10;    4. unary 4!&#10;2. Stringer, Scanner and Parser seem to be working fine&#10;3. MathProblemSolver built, the function his the &quot;head&quot; of the program&#10;functionality to add: 6&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;3. add built-in functions (min, max, log, etc)&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
+    <option name="LAST_COMMIT_MESSAGE" value="functionality added: 3&#10;1. there are four types of expressions: &#10;    1. Binary 5+4&#10;    2. Grouping (4+3)&#10;    3. Literal 5&#10;    4. unary 4!&#10;2. Stringer, Scanner and Parser seem to be working fine&#10;3. MathProblemSolver built, the function his the &quot;head&quot; of the program&#10;functionality to add: 6&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;3. add built-in functions (min, max, log, etc)&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/Stringer.java</url>
+          <line>39</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
