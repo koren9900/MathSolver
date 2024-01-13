@@ -1,0 +1,259 @@
+Index: src/Interpreter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Interpreter.java b/src/Interpreter.java
+--- a/src/Interpreter.java	(revision 06a0e9dca9d1ef50cff3cd4eb7bdc654c575cb5c)
++++ b/src/Interpreter.java	(revision 25683ed030f047a9f5d9235333404f4b64555b28)
+@@ -1,17 +1,21 @@
++import java.util.ArrayList;
+ import java.util.List;
+ 
+ 
+-class Interpreter implements Expr.Visitor<Object> {
++class Interpreter implements Expr.Visitor<Expr> {
+ 
+ 
+-    void interpret(List<Expr> expressions) {
++    List<Expr> interpret(List<Expr> expressions) {
+         try {
++            List<Expr> evaluatedExpressions = new ArrayList<>();
+             for (Expr expression : expressions) {
+-                execute(expression);
++                evaluatedExpressions.add(execute(expression));
+             }
++            return evaluatedExpressions;
+         } catch (RuntimeError error) {
+             MathProblemSolver.runtimeError(error);
+         }
++        return null;
+     }
+ 
+     private String stringify(Object object) {
+@@ -26,68 +30,58 @@
+         return object.toString();
+     }
+     @Override
+-    public Object visitLiteralExpr(Expr.Literal expr) {
++    public Expr visitLiteralExpr(Expr.Literal expr) {
+ 
+-        return expr.value;
++        return new Expr.Literal((double) expr.value);
+     }
+ 
+     @Override
+-    public Object visitUnaryExpr(Expr.Unary expr) {
++    public Expr visitUnaryExpr(Expr.Unary expr) {
+         Object right = evaluate(expr.right);
+         switch (expr.operator.type) {
+             case BANG:
+-                return !isTruthy(right);
++                return new Expr.Literal(factorial(expr.operator, (double)((Expr.Literal) right).value));
+             case MINUS:
+                 checkNumberOperand(expr.operator, right);
+-                return -(double)right;
++                return new Expr.Literal(-(double)((Expr.Literal) right).value);
+         }
+         // Unreachable.
+         return null;
+     }
+ 
++    private Double factorial(Token token, Object right) {
++        if(right instanceof Double){
++            if(Math.round((double)right) != (double) right || (double) right < 1)
++                throw new RuntimeError(token,"Factorial works only on natural numbers");
++
++            double fact = 1;
++            for (int i = 2; i <= (double) right; i++)
++                fact = fact * i;
++            return fact;
++        }
++        else
++            throw new RuntimeError(token,"Factorial works only on numbers");
++
++    }
++
+     @Override
+-    public Object visitBinaryExpr(Expr.Binary expr) {
+-        Object left = evaluate(expr.left);
+-        Object right = evaluate(expr.right);
+-        switch (expr.operator.type) {
+-            case GREATER -> {
+-                checkNumberOperands(expr.operator, left, right);
+-                return (double) left > (double) right;
+-            }
+-            case GREATER_EQUAL -> {
+-                checkNumberOperands(expr.operator, left, right);
+-                return (double) left >= (double) right;
+-            }
+-            case LESS -> {
+-                checkNumberOperands(expr.operator, left, right);
+-                return (double) left < (double) right;
+-            }
+-            case LESS_EQUAL -> {
+-                checkNumberOperands(expr.operator, left, right);
+-                return (double) left <= (double) right;
+-            }
++    public Expr visitBinaryExpr(Expr.Binary expr) {
++        Expr left = evaluate(expr.left);
++        Expr right = evaluate(expr.right);
++        checkNumberOperands(expr.operator, left, right);
++        switch (expr.operator.type) {
+             case MINUS -> {
+-                checkNumberOperands(expr.operator, left, right);
+-                return (double) left - (double) right;
++                return new Expr.Literal((double)((Expr.Literal) left).value - (double)((Expr.Literal) right).value);
+             }
+             case PLUS -> {
+-                if (left instanceof Double && right instanceof Double) {
+-                    return (double) left + (double) right;
+-                }
+-                if ((left instanceof String && right instanceof String)
+-                        || (left instanceof String && right instanceof Double)
+-                        || (right instanceof String && left instanceof Double)) {
+-                    return stringify(left) + stringify(right);
+-                }
+-                throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
++                return new Expr.Literal((double)((Expr.Literal) left).value + (double)((Expr.Literal) right).value);
+             }
+             case SLASH -> {
+-                checkNumberOperands(expr.operator, left, right);
+-                return (double) left / (double) right;
++                return new Expr.Literal((double)((Expr.Literal) left).value / (double)((Expr.Literal) right).value);
+             }
+             case STAR -> {
+-                checkNumberOperands(expr.operator, left, right);
+-                return (double) left * (double) right;
++
++                return new Expr.Literal((double)((Expr.Literal) left).value * (double)((Expr.Literal) right).value);
+             }
+         }
+         // Unreachable.
+@@ -95,32 +89,25 @@
+     }
+ 
+     @Override
+-    public Object visitGroupingExpr(Expr.Grouping expr) {
++    public Expr visitGroupingExpr(Expr.Grouping expr) {
+         return evaluate(expr.expression);
+     }
+ 
+-    private Object evaluate(Expr expr) {
++    private Expr evaluate(Expr expr) {
+         return expr.accept(this);
+     }
+ 
+-    private void execute(Expr expr) {
+-        expr.accept(this);
+-    }
+-
+-
+-    private boolean isTruthy(Object object) {
+-        if (object == null) return false;
+-        if (object instanceof Boolean) return (boolean)object;
+-        return true;
++    private Expr execute(Expr expr) {
++        return expr.accept(this);
+     }
+ 
+     private void checkNumberOperand(Token operator, Object operand) {
+-        if (operand instanceof Double) return;
++        if (operand instanceof Expr.Literal) return;
+         throw new RuntimeError(operator, "Operand must be a number.");
+     }
+ 
+     private void checkNumberOperands(Token operator, Object left, Object right) {
+-        if (left instanceof Double && right instanceof Double) return;
++        if (left instanceof Expr.Literal && right instanceof Expr.Literal) return;
+         throw new RuntimeError(operator, "Operands must be numbers.");
+     }
+ 
+Index: src/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Main.java b/src/Main.java
+--- a/src/Main.java	(revision 06a0e9dca9d1ef50cff3cd4eb7bdc654c575cb5c)
++++ b/src/Main.java	(revision 25683ed030f047a9f5d9235333404f4b64555b28)
+@@ -4,7 +4,7 @@
+ 
+ 
+     public static void main(String[] args) {
+-        String exp = "5+111/2";
++        String exp = "(3*((4/5)+(1/5)))!";
+         System.out.println(new MathProblemSolver(exp).solve());
+ 
+     }
+Index: src/MathProblemSolver.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/MathProblemSolver.java b/src/MathProblemSolver.java
+--- a/src/MathProblemSolver.java	(revision 06a0e9dca9d1ef50cff3cd4eb7bdc654c575cb5c)
++++ b/src/MathProblemSolver.java	(revision 25683ed030f047a9f5d9235333404f4b64555b28)
+@@ -15,9 +15,12 @@
+ 
+     public String solve(){
+         Interpreter interpreter = new Interpreter();
+-        interpreter.interpret(expressions);
++        List<Expr> evaluatedExpressions = interpreter.interpret(expressions);
+         Stringer stringer = new Stringer();
+-        return stringer.stringify(expressions).toString();
++        String s = stringer.stringify(expressions).toString();
++        s += "=";
++        s += stringer.stringify(evaluatedExpressions);
++        return stringer.stringify(expressions).toString() + "=" + stringer.stringify(evaluatedExpressions);
+     }
+     static void error(int line, String message) {
+         report(line, "", message);
+Index: src/Parser.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Parser.java b/src/Parser.java
+--- a/src/Parser.java	(revision 06a0e9dca9d1ef50cff3cd4eb7bdc654c575cb5c)
++++ b/src/Parser.java	(revision 25683ed030f047a9f5d9235333404f4b64555b28)
+@@ -47,12 +47,17 @@
+ 
+ 
+     private Expr unary() {
+-        if (match(TokenType.BANG, TokenType.MINUS)) {
++        if (match(TokenType.MINUS)) {
+             Token operator = previous();
+             Expr right = unary();
+             return new Expr.Unary(operator, right);
+         }
+-        return primary();
++        Expr right = primary();
++        while(match(TokenType.BANG)){
++            Token operator = previous();
++            right = new Expr.Unary(operator, right);
++        }
++        return right;
+     }
+ 
+ 
+Index: src/Stringer.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Stringer.java b/src/Stringer.java
+--- a/src/Stringer.java	(revision 06a0e9dca9d1ef50cff3cd4eb7bdc654c575cb5c)
++++ b/src/Stringer.java	(revision 25683ed030f047a9f5d9235333404f4b64555b28)
+@@ -34,9 +34,9 @@
+     @Override
+     public String visitUnaryExpr(Expr.Unary expr) {
+         if(expr.operator.type == TokenType.BANG)
+-            return expr.right.accept(this) + expr.operator.literal;
++            return expr.right.accept(this) + expr.operator.lexeme;
+ 
+         else
+-            return expr.operator.literal + expr.right.accept(this);
++            return expr.operator.lexeme + expr.right.accept(this);
+     }
+ }

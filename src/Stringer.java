@@ -34,6 +34,16 @@ public class Stringer  implements Expr.Visitor<String> {
     }
 
     @Override
+    public String visitVectorExpr(Expr.Vector expr) {
+        StringBuilder funcString = new StringBuilder();
+        funcString.append('(');
+        for(Expr param : expr.values)
+            funcString.append(param.accept(this)).append(',');
+        funcString.delete(funcString.length()-1, funcString.length()).append(')');
+        return funcString.toString();
+    }
+
+    @Override
     public String visitUnaryExpr(Expr.Unary expr) {
         if(expr.operator.type == TokenType.BANG)
             return expr.right.accept(this) + expr.operator.lexeme;

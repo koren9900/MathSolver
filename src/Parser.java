@@ -28,6 +28,7 @@ class Parser {
 
     private Expr term() {
         Expr expr = factor();
+        // While there is addition or subtraction add them to the expression
         while (match(TokenType.MINUS, TokenType.PLUS)) {
             Token operator = previous();
             Expr right = factor();
@@ -38,6 +39,7 @@ class Parser {
 
     private Expr factor() {
         Expr expr = exponent();
+        // While there is division or multiplication add them to the expression
         while (match(TokenType.SLASH, TokenType.STAR)) {
             Token operator = previous();
             Expr right = exponent();
@@ -47,6 +49,7 @@ class Parser {
     }
     private Expr exponent() {
         Expr expr = unary();
+        // While there is an exponent add it to the expression
         while (match(TokenType.CARET)) {
             Token operator = previous();
             Expr right = unary();
@@ -56,12 +59,14 @@ class Parser {
     }
 
     private Expr unary() {
+        // if there is a minus, then it's a negation minus
         if (match(TokenType.MINUS)) {
             Token operator = previous();
             Expr right = unary();
             return new Expr.Unary(operator, right);
         }
         Expr right = function();
+        // as long as there are factorial signs keep adding them to the expression
         while(match(TokenType.BANG)){
             Token operator = previous();
             right = new Expr.Unary(operator, right);
@@ -69,14 +74,18 @@ class Parser {
         return right;
     }
     private Expr function(){
+        // check for a function
         if(match(TokenType.FUNC)){
             Token func = previous();
+            // Make sure there is a left parentheses after the function name
             consume(TokenType.LEFT_PAREN, "Expect '(' after a function");
             List<Expr> params = new LinkedList<>();
+            // find all the parameters
             do{
                 params.add(expression());
 
             }while(match(TokenType.COMMA));
+            // Make sure there is a right parentheses at the end of the function
             consume(TokenType.RIGHT_PAREN, "Expect '(' in the end of a function");
             return new Expr.Function(func, params);
         }
@@ -84,14 +93,23 @@ class Parser {
     }
 
     private Expr primary() {
-
+        // check for a literal
         if (match(TokenType.NUMBER))
             return new Expr.Literal((Double) previous().literal);
-
+        // check for parentheses
         if (match(TokenType.LEFT_PAREN)) {
-            Expr expr = expression();
+            List<Expr> values = new LinkedList<>();
+            values.add(expression());
+            // check for a vector
+            while(match(TokenType.COMMA))
+                values.add(expression());
+            // Make sure there is a right parentheses at the end
             consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
-            return new Expr.Grouping(expr);
+            // if there is only one value than it's a simple expression, if there is more than it's a vector
+            if(values.size() == 1)
+                return new Expr.Grouping(values.get(0));
+            else
+                return new Expr.Vector(values);
         }
 
 

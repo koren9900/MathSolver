@@ -5,6 +5,7 @@ abstract class Expr {
         R visitBinaryExpr(Binary expr);
         R visitGroupingExpr(Grouping expr);
         R visitLiteralExpr(Literal expr);
+        R visitVectorExpr(Vector expr);
         R visitUnaryExpr(Unary expr);
         R visitFunctionExpr(Function expr);
     }
@@ -51,7 +52,18 @@ abstract class Expr {
 
         final Object value;
     }
+    static class Vector extends Expr {
+        Vector(List<Expr> values) {
+            this.values = values;
+        }
 
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitVectorExpr(this);
+        }
+
+        final List<Expr> values;
+    }
     static class Unary extends Expr {
         Unary(Token operator, Expr right) {
             this.operator = operator;
@@ -80,5 +92,7 @@ abstract class Expr {
         final Token function;
         final List<Expr> parameters;
     }
+
+
     abstract <R> R accept(Visitor<R> visitor);
 }

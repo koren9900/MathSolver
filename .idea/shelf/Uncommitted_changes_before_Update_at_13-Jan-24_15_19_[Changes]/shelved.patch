@@ -1,0 +1,336 @@
+Index: functionality_added__4_1__Make_sure_the_Interpreter_works_2__Print_the_results_from_the_In.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/functionality_added__4_1__Make_sure_the_Interpreter_works_2__Print_the_results_from_the_In.patch b/functionality_added__4_1__Make_sure_the_Interpreter_works_2__Print_the_results_from_the_In.patch
+new file mode 100644
+--- /dev/null	(date 1705151547923)
++++ b/functionality_added__4_1__Make_sure_the_Interpreter_works_2__Print_the_results_from_the_In.patch	(date 1705151547923)
+@@ -0,0 +1,259 @@
++Index: src/Interpreter.java
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/src/Interpreter.java b/src/Interpreter.java
++--- a/src/Interpreter.java	(revision 06a0e9dca9d1ef50cff3cd4eb7bdc654c575cb5c)
+++++ b/src/Interpreter.java	(revision 25683ed030f047a9f5d9235333404f4b64555b28)
++@@ -1,17 +1,21 @@
+++import java.util.ArrayList;
++ import java.util.List;
++ 
++ 
++-class Interpreter implements Expr.Visitor<Object> {
+++class Interpreter implements Expr.Visitor<Expr> {
++ 
++ 
++-    void interpret(List<Expr> expressions) {
+++    List<Expr> interpret(List<Expr> expressions) {
++         try {
+++            List<Expr> evaluatedExpressions = new ArrayList<>();
++             for (Expr expression : expressions) {
++-                execute(expression);
+++                evaluatedExpressions.add(execute(expression));
++             }
+++            return evaluatedExpressions;
++         } catch (RuntimeError error) {
++             MathProblemSolver.runtimeError(error);
++         }
+++        return null;
++     }
++ 
++     private String stringify(Object object) {
++@@ -26,68 +30,58 @@
++         return object.toString();
++     }
++     @Override
++-    public Object visitLiteralExpr(Expr.Literal expr) {
+++    public Expr visitLiteralExpr(Expr.Literal expr) {
++ 
++-        return expr.value;
+++        return new Expr.Literal((double) expr.value);
++     }
++ 
++     @Override
++-    public Object visitUnaryExpr(Expr.Unary expr) {
+++    public Expr visitUnaryExpr(Expr.Unary expr) {
++         Object right = evaluate(expr.right);
++         switch (expr.operator.type) {
++             case BANG:
++-                return !isTruthy(right);
+++                return new Expr.Literal(factorial(expr.operator, (double)((Expr.Literal) right).value));
++             case MINUS:
++                 checkNumberOperand(expr.operator, right);
++-                return -(double)right;
+++                return new Expr.Literal(-(double)((Expr.Literal) right).value);
++         }
++         // Unreachable.
++         return null;
++     }
++ 
+++    private Double factorial(Token token, Object right) {
+++        if(right instanceof Double){
+++            if(Math.round((double)right) != (double) right || (double) right < 1)
+++                throw new RuntimeError(token,"Factorial works only on natural numbers");
+++
+++            double fact = 1;
+++            for (int i = 2; i <= (double) right; i++)
+++                fact = fact * i;
+++            return fact;
+++        }
+++        else
+++            throw new RuntimeError(token,"Factorial works only on numbers");
+++
+++    }
+++
++     @Override
++-    public Object visitBinaryExpr(Expr.Binary expr) {
++-        Object left = evaluate(expr.left);
++-        Object right = evaluate(expr.right);
++-        switch (expr.operator.type) {
++-            case GREATER -> {
++-                checkNumberOperands(expr.operator, left, right);
++-                return (double) left > (double) right;
++-            }
++-            case GREATER_EQUAL -> {
++-                checkNumberOperands(expr.operator, left, right);
++-                return (double) left >= (double) right;
++-            }
++-            case LESS -> {
++-                checkNumberOperands(expr.operator, left, right);
++-                return (double) left < (double) right;
++-            }
++-            case LESS_EQUAL -> {
++-                checkNumberOperands(expr.operator, left, right);
++-                return (double) left <= (double) right;
++-            }
+++    public Expr visitBinaryExpr(Expr.Binary expr) {
+++        Expr left = evaluate(expr.left);
+++        Expr right = evaluate(expr.right);
+++        checkNumberOperands(expr.operator, left, right);
+++        switch (expr.operator.type) {
++             case MINUS -> {
++-                checkNumberOperands(expr.operator, left, right);
++-                return (double) left - (double) right;
+++                return new Expr.Literal((double)((Expr.Literal) left).value - (double)((Expr.Literal) right).value);
++             }
++             case PLUS -> {
++-                if (left instanceof Double && right instanceof Double) {
++-                    return (double) left + (double) right;
++-                }
++-                if ((left instanceof String && right instanceof String)
++-                        || (left instanceof String && right instanceof Double)
++-                        || (right instanceof String && left instanceof Double)) {
++-                    return stringify(left) + stringify(right);
++-                }
++-                throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
+++                return new Expr.Literal((double)((Expr.Literal) left).value + (double)((Expr.Literal) right).value);
++             }
++             case SLASH -> {
++-                checkNumberOperands(expr.operator, left, right);
++-                return (double) left / (double) right;
+++                return new Expr.Literal((double)((Expr.Literal) left).value / (double)((Expr.Literal) right).value);
++             }
++             case STAR -> {
++-                checkNumberOperands(expr.operator, left, right);
++-                return (double) left * (double) right;
+++
+++                return new Expr.Literal((double)((Expr.Literal) left).value * (double)((Expr.Literal) right).value);
++             }
++         }
++         // Unreachable.
++@@ -95,32 +89,25 @@
++     }
++ 
++     @Override
++-    public Object visitGroupingExpr(Expr.Grouping expr) {
+++    public Expr visitGroupingExpr(Expr.Grouping expr) {
++         return evaluate(expr.expression);
++     }
++ 
++-    private Object evaluate(Expr expr) {
+++    private Expr evaluate(Expr expr) {
++         return expr.accept(this);
++     }
++ 
++-    private void execute(Expr expr) {
++-        expr.accept(this);
++-    }
++-
++-
++-    private boolean isTruthy(Object object) {
++-        if (object == null) return false;
++-        if (object instanceof Boolean) return (boolean)object;
++-        return true;
+++    private Expr execute(Expr expr) {
+++        return expr.accept(this);
++     }
++ 
++     private void checkNumberOperand(Token operator, Object operand) {
++-        if (operand instanceof Double) return;
+++        if (operand instanceof Expr.Literal) return;
++         throw new RuntimeError(operator, "Operand must be a number.");
++     }
++ 
++     private void checkNumberOperands(Token operator, Object left, Object right) {
++-        if (left instanceof Double && right instanceof Double) return;
+++        if (left instanceof Expr.Literal && right instanceof Expr.Literal) return;
++         throw new RuntimeError(operator, "Operands must be numbers.");
++     }
++ 
++Index: src/Main.java
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/src/Main.java b/src/Main.java
++--- a/src/Main.java	(revision 06a0e9dca9d1ef50cff3cd4eb7bdc654c575cb5c)
+++++ b/src/Main.java	(revision 25683ed030f047a9f5d9235333404f4b64555b28)
++@@ -4,7 +4,7 @@
++ 
++ 
++     public static void main(String[] args) {
++-        String exp = "5+111/2";
+++        String exp = "(3*((4/5)+(1/5)))!";
++         System.out.println(new MathProblemSolver(exp).solve());
++ 
++     }
++Index: src/MathProblemSolver.java
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/src/MathProblemSolver.java b/src/MathProblemSolver.java
++--- a/src/MathProblemSolver.java	(revision 06a0e9dca9d1ef50cff3cd4eb7bdc654c575cb5c)
+++++ b/src/MathProblemSolver.java	(revision 25683ed030f047a9f5d9235333404f4b64555b28)
++@@ -15,9 +15,12 @@
++ 
++     public String solve(){
++         Interpreter interpreter = new Interpreter();
++-        interpreter.interpret(expressions);
+++        List<Expr> evaluatedExpressions = interpreter.interpret(expressions);
++         Stringer stringer = new Stringer();
++-        return stringer.stringify(expressions).toString();
+++        String s = stringer.stringify(expressions).toString();
+++        s += "=";
+++        s += stringer.stringify(evaluatedExpressions);
+++        return stringer.stringify(expressions).toString() + "=" + stringer.stringify(evaluatedExpressions);
++     }
++     static void error(int line, String message) {
++         report(line, "", message);
++Index: src/Parser.java
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/src/Parser.java b/src/Parser.java
++--- a/src/Parser.java	(revision 06a0e9dca9d1ef50cff3cd4eb7bdc654c575cb5c)
+++++ b/src/Parser.java	(revision 25683ed030f047a9f5d9235333404f4b64555b28)
++@@ -47,12 +47,17 @@
++ 
++ 
++     private Expr unary() {
++-        if (match(TokenType.BANG, TokenType.MINUS)) {
+++        if (match(TokenType.MINUS)) {
++             Token operator = previous();
++             Expr right = unary();
++             return new Expr.Unary(operator, right);
++         }
++-        return primary();
+++        Expr right = primary();
+++        while(match(TokenType.BANG)){
+++            Token operator = previous();
+++            right = new Expr.Unary(operator, right);
+++        }
+++        return right;
++     }
++ 
++ 
++Index: src/Stringer.java
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/src/Stringer.java b/src/Stringer.java
++--- a/src/Stringer.java	(revision 06a0e9dca9d1ef50cff3cd4eb7bdc654c575cb5c)
+++++ b/src/Stringer.java	(revision 25683ed030f047a9f5d9235333404f4b64555b28)
++@@ -34,9 +34,9 @@
++     @Override
++     public String visitUnaryExpr(Expr.Unary expr) {
++         if(expr.operator.type == TokenType.BANG)
++-            return expr.right.accept(this) + expr.operator.literal;
+++            return expr.right.accept(this) + expr.operator.lexeme;
++ 
++         else
++-            return expr.operator.literal + expr.right.accept(this);
+++            return expr.operator.lexeme + expr.right.accept(this);
++     }
++ }
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"66edb2ca-3ffa-45d2-9045-312b00fceada\" name=\"Changes\" comment=\"functionality added: 4&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;functionality to add: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/Expr.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/Expr.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/Interpreter.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/Interpreter.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/Main.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/Main.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/MathProblemSolver.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/MathProblemSolver.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/Parser.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/Parser.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/Scanner.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/Scanner.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/Stringer.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/Stringer.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/TokenType.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/TokenType.java\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Enum\" />\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2arwvU6YsbONEKzHCUo9gJXp6lK\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CreateClassDialog.RecentsKey\">\r\n      <recent name=\"\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"Main\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"Main\" />\r\n      <module name=\"MathSolverV2\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Application.Main\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"66edb2ca-3ffa-45d2-9045-312b00fceada\" name=\"Changes\" comment=\"\" />\r\n      <created>1705090237419</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1705090237419</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"functionality added: 3&#10;1. there are four types of expressions: &#10;    1. Binary 5+4&#10;    2. Grouping (4+3)&#10;    3. Literal 5&#10;    4. unary 4!&#10;2. Stringer, Scanner and Parser seem to be working fine&#10;3. MathProblemSolver built, the function his the &quot;head&quot; of the program&#10;functionality to add: 6&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;3. add built-in functions (min, max, log, etc)&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)\">\r\n      <created>1705096508542</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1705096508542</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"functionality added: 4&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;functionality to add: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)\">\r\n      <created>1705099486506</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1705099486506</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"functionality added: 4&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;functionality to add: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)\">\r\n      <created>1705099494390</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1705099494390</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"4\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"functionality added: 3&#10;1. there are four types of expressions: &#10;    1. Binary 5+4&#10;    2. Grouping (4+3)&#10;    3. Literal 5&#10;    4. unary 4!&#10;2. Stringer, Scanner and Parser seem to be working fine&#10;3. MathProblemSolver built, the function his the &quot;head&quot; of the program&#10;functionality to add: 6&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;3. add built-in functions (min, max, log, etc)&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)\" />\r\n    <MESSAGE value=\"functionality added: 4&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;functionality to add: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"functionality added: 4&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;functionality to add: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision b0587024c4fc527c377e8eea48dfb0e005e04d9b)
++++ b/.idea/workspace.xml	(date 1705151568261)
+@@ -1,17 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="ChangeListManager">
+-    <list default="true" id="66edb2ca-3ffa-45d2-9045-312b00fceada" name="Changes" comment="functionality added: 4&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;functionality to add: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)">
+-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/Expr.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Expr.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Interpreter.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/MathProblemSolver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MathProblemSolver.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Parser.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/Scanner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Scanner.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/Stringer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Stringer.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/TokenType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TokenType.java" afterDir="false" />
+-    </list>
++    <list default="true" id="66edb2ca-3ffa-45d2-9045-312b00fceada" name="Changes" comment="functionality added: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+@@ -26,6 +16,11 @@
+     </option>
+   </component>
+   <component name="Git.Settings">
++    <option name="PREVIOUS_COMMIT_AUTHORS">
++      <list>
++        <option value="koren9900 &lt;koren9900@gmail.com&gt;" />
++      </list>
++    </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+   <component name="MarkdownSettingsMigration">
+@@ -92,7 +87,14 @@
+       <option name="project" value="LOCAL" />
+       <updated>1705099494390</updated>
+     </task>
+-    <option name="localTasksCounter" value="4" />
++    <task id="LOCAL-00004" summary="functionality added: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)">
++      <created>1705151443595</created>
++      <option name="number" value="00004" />
++      <option name="presentableId" value="LOCAL-00004" />
++      <option name="project" value="LOCAL" />
++      <updated>1705151443595</updated>
++    </task>
++    <option name="localTasksCounter" value="5" />
+     <servers />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
+@@ -109,6 +111,7 @@
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="functionality added: 3&#10;1. there are four types of expressions: &#10;    1. Binary 5+4&#10;    2. Grouping (4+3)&#10;    3. Literal 5&#10;    4. unary 4!&#10;2. Stringer, Scanner and Parser seem to be working fine&#10;3. MathProblemSolver built, the function his the &quot;head&quot; of the program&#10;functionality to add: 6&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;3. add built-in functions (min, max, log, etc)&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
+     <MESSAGE value="functionality added: 4&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;functionality to add: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
+-    <option name="LAST_COMMIT_MESSAGE" value="functionality added: 4&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;functionality to add: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
++    <MESSAGE value="functionality added: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
++    <option name="LAST_COMMIT_MESSAGE" value="functionality added: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
+   </component>
+ </project>
+\ No newline at end of file
