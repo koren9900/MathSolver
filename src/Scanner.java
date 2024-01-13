@@ -77,13 +77,13 @@ class Scanner {
     private void identifier() {
         while (isAlphaNumeric(peek())) advance();
 
-        String text = source.substring(start, current);
+        String text = source.substring(start, current).toLowerCase();
 
         if (!keywords.contains(text))
             for(char c : text.toCharArray())
                 addToken(TokenType.IDENTIFIER, Character.toString(c));
         else
-            addToken(TokenType.FUNC, text.toLowerCase());
+            addToken(TokenType.FUNC);
     }
     private void number() {
         while (isDigit(peek())) advance();
@@ -142,6 +142,8 @@ class Scanner {
 
     private void addToken(TokenType type, Object literal) {
         String text = source.substring(start, current);
+        if(type == TokenType.FUNC)
+            text = text.toLowerCase();
         tokens.add(new Token(type, text, literal, line));
     }
 }

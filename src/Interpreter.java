@@ -43,8 +43,10 @@ class Interpreter implements Expr.Visitor<Expr> {
             case BANG:
                 return new Expr.Literal(factorial(expr.operator, ((Expr.Literal) right).value));
             case MINUS:
-                checkNumberOperand(expr.operator, right);
-                return new Expr.Literal(-(double)((Expr.Literal) right).value);
+                if(checkNumberOperand(right))
+                    return new Expr.Literal(-(double)((Expr.Literal) right).value);
+                else if(checkVectorOperand(right))
+                    return calcVectorNumberBinary(new Token(TokenType.STAR,null,null,1), new Expr.Literal(-1.0), (Expr.Vector) right);
         }
         // Unreachable.
         return null;
@@ -219,11 +221,12 @@ class Interpreter implements Expr.Visitor<Expr> {
         return expr.accept(this);
     }
 
-    private void checkNumberOperand(Token operator, Object operand) {
-        if (operand instanceof Expr.Literal) return;
-        throw new RuntimeError(operator, "Operand must be a number.");
+    private boolean checkNumberOperand(Object operand) {
+        return operand instanceof Expr.Literal;
     }
-
+    private boolean checkVectorOperand(Object operand) {
+        return operand instanceof Expr.Vector;
+    }
     private boolean checkNumberOperands(Object left, Object right) {
         return left instanceof Expr.Literal && right instanceof Expr.Literal;
     }

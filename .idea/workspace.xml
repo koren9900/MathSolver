@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="66edb2ca-3ffa-45d2-9045-312b00fceada" name="Changes" comment="functionality added: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)">
-      <change afterPath="$PROJECT_DIR$/functionality_added__4_1__Make_sure_the_Interpreter_works_2__Print_the_results_from_the_In.patch" afterDir="false" />
+    <list default="true" id="66edb2ca-3ffa-45d2-9045-312b00fceada" name="Changes" comment="functionality added: 1&#10;1. added vectors&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)">
+      <change afterPath="$PROJECT_DIR$/test/MainTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Expr.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Expr.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MathSolverV2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/MathSolverV2.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Interpreter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Parser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Stringer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Stringer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scanner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Scanner.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,18 +45,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Downloaded.Files.Path.Enabled": "false",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="JUnit.MainTest">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="MathSolverV2" />
@@ -65,9 +68,52 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="MainTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="MathSolverV2" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="MainTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainTest.testLiteralBinary" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="MathSolverV2" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="MainTest" />
+      <option name="METHOD_NAME" value="testLiteralBinary" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainTest.testVectorBinary" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="MathSolverV2" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="MainTest" />
+      <option name="METHOD_NAME" value="testVectorBinary" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainTest.testVectorNegation" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="MathSolverV2" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="MainTest" />
+      <option name="METHOD_NAME" value="testVectorNegation" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.MainTest" />
+        <item itemvalue="JUnit.MainTest.testVectorNegation" />
         <item itemvalue="Application.Main" />
+        <item itemvalue="JUnit.MainTest.testVectorBinary" />
+        <item itemvalue="JUnit.MainTest.testLiteralBinary" />
       </list>
     </recent_temporary>
   </component>
@@ -108,7 +154,14 @@
       <option name="project" value="LOCAL" />
       <updated>1705151443595</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="functionality added: 1&#10;1. added vectors&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)">
+      <created>1705178167551</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1705178167551</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -116,7 +169,44 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="false" />
+                </map>
+              </option>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="HEAD" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="master" />
+                </option>
+              </RecentGroup>
+            </list>
           </value>
         </entry>
       </map>
@@ -126,6 +216,7 @@
     <MESSAGE value="functionality added: 3&#10;1. there are four types of expressions: &#10;    1. Binary 5+4&#10;    2. Grouping (4+3)&#10;    3. Literal 5&#10;    4. unary 4!&#10;2. Stringer, Scanner and Parser seem to be working fine&#10;3. MathProblemSolver built, the function his the &quot;head&quot; of the program&#10;functionality to add: 6&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;3. add built-in functions (min, max, log, etc)&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
     <MESSAGE value="functionality added: 4&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;functionality to add: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
     <MESSAGE value="functionality added: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
-    <option name="LAST_COMMIT_MESSAGE" value="functionality added: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
+    <MESSAGE value="functionality added: 1&#10;1. added vectors&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
+    <option name="LAST_COMMIT_MESSAGE" value="functionality added: 1&#10;1. added vectors&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
   </component>
 </project>
