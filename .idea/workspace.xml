@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="66edb2ca-3ffa-45d2-9045-312b00fceada" name="Changes" comment="functionality added: 4&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;functionality to add: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)">
+    <list default="true" id="66edb2ca-3ffa-45d2-9045-312b00fceada" name="Changes" comment="functionality added: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)">
+      <change afterPath="$PROJECT_DIR$/functionality_added__4_1__Make_sure_the_Interpreter_works_2__Print_the_results_from_the_In.patch" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Expr.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Expr.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Interpreter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Interpreter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MathProblemSolver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MathProblemSolver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Parser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Scanner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Scanner.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Stringer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Stringer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TokenType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TokenType.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,7 +24,18 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="koren9900 &lt;koren9900@gmail.com&gt;" />
+      </list>
+    </option>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="MIXED" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -37,12 +46,12 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="" />
@@ -92,7 +101,14 @@
       <option name="project" value="LOCAL" />
       <updated>1705099494390</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="functionality added: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)">
+      <created>1705151443595</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1705151443595</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -109,6 +125,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="functionality added: 3&#10;1. there are four types of expressions: &#10;    1. Binary 5+4&#10;    2. Grouping (4+3)&#10;    3. Literal 5&#10;    4. unary 4!&#10;2. Stringer, Scanner and Parser seem to be working fine&#10;3. MathProblemSolver built, the function his the &quot;head&quot; of the program&#10;functionality to add: 6&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;3. add built-in functions (min, max, log, etc)&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
     <MESSAGE value="functionality added: 4&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;functionality to add: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
-    <option name="LAST_COMMIT_MESSAGE" value="functionality added: 4&#10;1. Make sure the Interpreter works&#10;2. Print the results from the Interpreter&#10;4. add functionality to factorial !&#10;5. make sure negating works&#10;functionality to add: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
+    <MESSAGE value="functionality added: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
+    <option name="LAST_COMMIT_MESSAGE" value="functionality added: 2&#10;3. add built-in functions (min, max, log, etc)&#10;6. add powers ^&#10;functionality to add: 0&#10;&#10;Bugs fixed: 0&#10;&#10;Bugs found: 0&#10;&#10;Notes: :)" />
   </component>
 </project>

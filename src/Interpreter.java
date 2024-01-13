@@ -26,6 +26,17 @@ class Interpreter implements Expr.Visitor<Expr> {
     }
 
     @Override
+    public Expr visitVectorExpr(Expr.Vector expr) {
+        List<Expr> values = new LinkedList<>();
+
+        for(Expr exp : expr.values)
+            values.add(exp.accept(this));
+
+        return new Expr.Vector(values);
+
+    }
+
+    @Override
     public Expr visitUnaryExpr(Expr.Unary expr) {
         Object right = evaluate(expr.right);
         switch (expr.operator.type) {
@@ -88,7 +99,7 @@ class Interpreter implements Expr.Visitor<Expr> {
             }
             case "log" ->{
                 if(evaluatedDoubleParams.size() != 2)
-                    throw new RuntimeError(expr.function, "Round functions take exactly one parameter");
+                    throw new RuntimeError(expr.function, "Log functions take exactly two parameters");
                 return new Expr.Literal(Math.log(evaluatedDoubleParams.get(1))/Math.log(evaluatedDoubleParams.get(0)));
             }
 
@@ -115,27 +126,84 @@ class Interpreter implements Expr.Visitor<Expr> {
     public Expr visitBinaryExpr(Expr.Binary expr) {
         Expr left = evaluate(expr.left);
         Expr right = evaluate(expr.right);
-        checkNumberOperands(expr.operator, left, right);
-        switch (expr.operator.type) {
-            case MINUS -> {
-                return new Expr.Literal((double)((Expr.Literal) left).value - (double)((Expr.Literal) right).value);
-            }
-            case PLUS -> {
-                return new Expr.Literal((double)((Expr.Literal) left).value + (double)((Expr.Literal) right).value);
-            }
-            case SLASH -> {
-                return new Expr.Literal((double)((Expr.Literal) left).value / (double)((Expr.Literal) right).value);
-            }
-            case STAR -> {
+        //binary operation between two numbers
+        if(checkNumberOperands(left, right))
+            switch (expr.operator.type) {
+                case MINUS -> {
+                    return new Expr.Literal((double)((Expr.Literal) left).value - (double)((Expr.Literal) right).value);
+                }
+                case PLUS -> {
+                    return new Expr.Literal((double)((Expr.Literal) left).value + (double)((Expr.Literal) right).value);
+                }
+                case SLASH -> {
+                    return new Expr.Literal((double)((Expr.Literal) left).value / (double)((Expr.Literal) right).value);
+                }
+                case STAR -> {
 
-                return new Expr.Literal((double)((Expr.Literal) left).value * (double)((Expr.Literal) right).value);
+                    return new Expr.Literal((double)((Expr.Literal) left).value * (double)((Expr.Literal) right).value);
+                }
+                case CARET -> {
+                    return new Expr.Literal(Math.pow((double)((Expr.Literal) left).value ,(double)((Expr.Literal) right).value));
+                }
             }
-            case CARET -> {
-                return new Expr.Literal(Math.pow((double)((Expr.Literal) left).value ,(double)((Expr.Literal) right).value));
+        else if(checkVectorOperands(left, right))
+            switch (expr.operator.type) {
+                case MINUS, PLUS -> {
+                    return calcVectorBinary(expr.operator, (Expr.Vector) left,(Expr.Vector) right);
+                }
+                case SLASH, STAR, CARET -> {
+                    throw new RuntimeError(expr.operator, "Can't do this operation between two vectors");
+                }
             }
-        }
+        else if(checkNumberVectorOperands(left, right))
+            switch (expr.operator.type) {
+                case STAR -> {
+                    return calcVectorNumberBinary(expr.operator, (Expr.Literal) left,(Expr.Vector) right);
+                }
+                case SLASH -> {
+                    throw new RuntimeError(expr.operator, "It's not possible to divide scalar with a vector");
+                }
+                case MINUS, PLUS, CARET -> {
+                    throw new RuntimeError(expr.operator, "Can't do this operation between a vector and scalar");
+                }
+
+            }
+        else if(checkNumberVectorOperands(right, left))
+            switch (expr.operator.type) {
+                case SLASH, STAR -> {
+                    return calcVectorNumberBinary(expr.operator, (Expr.Literal) right,(Expr.Vector) left);
+                }
+                case MINUS, PLUS, CARET -> {
+                    throw new RuntimeError(expr.operator, "Can't do this operation between a vector and scalar");
+                }
+            }
         // Unreachable.
         return null;
+    }
+
+    private Expr calcVectorBinary(Token token, Expr.Vector left, Expr.Vector right) {
+        List<Expr> leftValues = left.values;
+        List<Expr> rightValues = right.values;
+        if(leftValues.size() != rightValues.size())
+            throw new RuntimeError(token, "Can't operate between different size vectors");
+        List<Expr> values = new LinkedList<>();
+        for(int i = 0; i < leftValues.size();i++){
+            Expr leftValue = leftValues.get(i).accept(this);
+            Expr rightValue = rightValues.get(i).accept(this);
+            Expr value = new Expr.Binary(leftValue, token, rightValue);
+            values.add(value.accept(this));
+        }
+        return new Expr.Vector(values);
+    }
+    private Expr calcVectorNumberBinary(Token token, Expr.Literal left, Expr.Vector right) {
+        List<Expr> rightValues = right.values;
+        List<Expr> values = new LinkedList<>();
+        for (Expr expr : rightValues) {
+            Expr rightValue = expr.accept(this);
+            Expr value = new Expr.Binary(rightValue, token,left);
+            values.add(value.accept(this));
+        }
+        return new Expr.Vector(values);
     }
 
     @Override
@@ -156,11 +224,16 @@ class Interpreter implements Expr.Visitor<Expr> {
         throw new RuntimeError(operator, "Operand must be a number.");
     }
 
-    private void checkNumberOperands(Token operator, Object left, Object right) {
-        if (left instanceof Expr.Literal && right instanceof Expr.Literal) return;
-        throw new RuntimeError(operator, "Operands must be numbers.");
+    private boolean checkNumberOperands(Object left, Object right) {
+        return left instanceof Expr.Literal && right instanceof Expr.Literal;
+    }
+    private boolean checkNumberVectorOperands(Object left, Object right) {
+        return left instanceof Expr.Literal && right instanceof Expr.Vector;
     }
 
+    private boolean checkVectorOperands(Object left, Object right) {
+        return left instanceof Expr.Vector && right instanceof Expr.Vector;
+    }
     private List<Double> exprToDouble(Token func, List<Expr> expressions){
         List<Double> doubles = new LinkedList<>();
         for(Expr expr: expressions){
