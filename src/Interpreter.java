@@ -153,21 +153,21 @@ class Interpreter implements Expr.Visitor<Expr> {
                 case MINUS, PLUS -> {
                     return calcVectorBinary(expr.operator, (Expr.Vector) left,(Expr.Vector) right);
                 }
-                case SLASH, STAR, CARET -> {
+                case SLASH, STAR, CARET ->
                     throw new RuntimeError(expr.operator, "Can't do this operation between two vectors");
-                }
+
             }
         else if(checkNumberVectorOperands(left, right))
             switch (expr.operator.type) {
                 case STAR -> {
                     return calcVectorNumberBinary(expr.operator, (Expr.Literal) left,(Expr.Vector) right);
                 }
-                case SLASH -> {
+                case SLASH ->
                     throw new RuntimeError(expr.operator, "It's not possible to divide scalar with a vector");
-                }
-                case MINUS, PLUS, CARET -> {
+
+                case MINUS, PLUS, CARET ->
                     throw new RuntimeError(expr.operator, "Can't do this operation between a vector and scalar");
-                }
+
 
             }
         else if(checkNumberVectorOperands(right, left))
@@ -175,9 +175,9 @@ class Interpreter implements Expr.Visitor<Expr> {
                 case SLASH, STAR -> {
                     return calcVectorNumberBinary(expr.operator, (Expr.Literal) right,(Expr.Vector) left);
                 }
-                case MINUS, PLUS, CARET -> {
+                case MINUS, PLUS, CARET ->
                     throw new RuntimeError(expr.operator, "Can't do this operation between a vector and scalar");
-                }
+
             }
         // Unreachable.
         return null;

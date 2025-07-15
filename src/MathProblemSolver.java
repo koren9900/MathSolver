@@ -24,7 +24,7 @@ public class MathProblemSolver {
     }
     private static void report(int line, String where, String message) {
         System.err.println("[line " + line + "] Error" + where + ": " + message);
-        hadError = true;
+        System.exit(65);
     }
 
     static void error(Token token, String message) {
@@ -36,7 +36,7 @@ public class MathProblemSolver {
     }
     static void runtimeError(RuntimeError error) {
         System.err.println(error.getMessage() +
-                "\n[line " + error.token.line + "]");
-        hadRuntimeError = true;
+                " [line " + error.token.line + "]");
+        System.exit(70);
     }
 }

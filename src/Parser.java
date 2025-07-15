@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 class Parser {
     private static class ParseError extends RuntimeException {}
@@ -50,10 +51,18 @@ class Parser {
     private Expr exponent() {
         Expr expr = unary();
         // While there is an exponent add it to the expression
-        while (match(TokenType.CARET)) {
-            Token operator = previous();
-            Expr right = unary();
-            expr = new Expr.Binary(expr, operator, right);
+        Stack<Expr> exprs = new Stack<>();
+        exprs.push(expr);
+        while (match(TokenType.CARET))
+            exprs.push(unary());
+        if(exprs.size() > 1) {
+            Token expo = new Token(TokenType.CARET, "^", null, 0);
+            Expr right = exprs.pop();
+            Expr left = exprs.pop();
+            expr = new Expr.Binary(left, expo, right);
+            while(!exprs.isEmpty())
+                expr = new Expr.Binary(exprs.pop(), expo, expr);
+
         }
         return expr;
     }
